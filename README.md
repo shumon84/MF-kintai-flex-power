@@ -1,0 +1,1 @@
+# MF-kintai-flex-power
