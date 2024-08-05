@@ -1,14 +1,17 @@
 {
-  "name": "MF勤怠フレックスパワー表示君",
-  "version": "0.1.0",
+  "name": "残フレックスパワー表示君",
+  "version": "0.1.2",
   "manifest_version": 3,
-  "description": "MF 勤怠の日次勤怠画面に、出勤日の稼働時間の過不足を表示する欄を追加します。",
+  "description": "KING OF TIME の日次勤怠画面に、出勤日の稼働時間の過不足を表示する欄を追加します。",
   "permissions": [
     "clipboardRead",
     "clipboardWrite"
   ],
   "content_scripts": [{
-    "matches": ["https://attendance.moneyforward.com/my_page/attendances*"],
+    "matches": ["https://s2.ta.kingoftime.jp/admin*"],
+    "css": [
+      "style.css"
+    ],
     "js": [
       "content.js"
     ]

@@ -1,0 +1,19 @@
+.work-time-copy-tooltip {
+    display: inline-block;
+    border-bottom: 1px dotted black;
+    top: 527px;
+    left: 7px;
+    opacity: 50%;
+    pointer-events: none;
+
+    width: 80px;
+
+    background-color: #333;
+    color: #fff;
+    margin: auto;
+    text-align: center;
+    border-radius: 6px;
+
+    position: absolute;
+    z-index: 1;
+}

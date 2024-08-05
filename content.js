@@ -1,8 +1,7 @@
 window.onload = function () {
-    const grid = document.querySelector('body > div.attendance-contents > div.attendance-contents-inner > div > div > div > div > section > section > div.tw-bg-white > div.tw-flex.tw-flex-col-reverse.tw-border-b.tw-border-solid.tw-border-main > div.transition > section > section:nth-child(2) > section');
-
-    const titleLine = grid.children[0];
-    const contentLine = grid.children[1];
+    const grid = document.querySelector("body > div > div.htBlock-mainContents > div > div:nth-child(11) > table")
+    const titleLine = grid.children[0].children[0];
+    const contentLine = grid.children[1].children[0];
 
     const totalWorkingTimeTitleCell = titleLine.children[0];
     const totalWorkingTimeContentCell = contentLine.children[0];
@@ -13,35 +12,34 @@ window.onload = function () {
     contentLine.insertBefore(flexPowerContentCell, totalWorkingTimeContentCell);
 
     flexPowerTitleCell.firstChild.textContent = '残フレックスパワー';
-    const timeCardHeader = document.querySelector('body > div.attendance-contents > div.attendance-contents-inner > div > div > div > div > section > section > div.daily-attendances-table > div.att-pc.tw-p-16.tw-pt-0 > section > header > section > section > div');
-    const timeCard = document.querySelector('body > div.attendance-contents > div.attendance-contents-inner > div > div > div > div > section > section > div.daily-attendances-table > div.att-pc.tw-p-16.tw-pt-0 > section > section > section > section');
+    const timeCardHeader = document.querySelector("body > div > div.htBlock-mainContents > div > div.htBlock-adjastableTableF > div.htBlock-adjastableTableF_inner > table > thead > tr");
+    const timeCard = document.querySelectorAll("body > div > div.htBlock-mainContents > div > div.htBlock-adjastableTableF > div.htBlock-adjastableTableF_inner > table > tbody > tr");
     flexPowerContentCell.firstChild.textContent = calcFlexPower(timeCardHeader, timeCard);
 
-    grid.style.cssText = '--horizontal-cells:repeat(7, 1fr); --cell-padding:4px 8px;';
+    //grid.style.cssText = '--horizontal-cells:repeat(7, 1fr); --cell-padding:4px 8px;';
 
     const button = document.createElement('button');
-    button.textContent = '労働時間ぶちぬきボタン';
-    flexPowerContentCell.appendChild(button);
+    button.textContent = 'ぶちぬき';
+    button.style.cssText = 'margin-right:8px;';
+    flexPowerContentCell.prepend(button);
 
     button.addEventListener('click', function () {
         const text = getWorkTimeList(timeCardHeader, timeCard);
         navigator.clipboard.writeText(text).then(function () {
-            console.log('労働時間がクリップボードにコピーされました');
+            showTooltip(button, 'コピー！');
         }, function () {
-            console.error('労働時間をクリップボードにコピーできませんでした');
+            showTooltip(button, '失敗！');
         });
     });
-
 }
 
 function calcFlexPower(timeCardHeader, timeCard) {
-    const totalWorkRowIndex = [...timeCardHeader.children].findIndex(x => x.firstChild.textContent === '総労働');
-    const flexPower = [...timeCard.children]
+    const totalWorkRowIndex = [...timeCardHeader.children].findIndex(x => x.firstChild.textContent === '労働合計');
+    const flexPower = [...timeCard]
         .map(x => x.children[totalWorkRowIndex])
-        .map(x => x.firstChild.textContent)
-        .map(x => x.replace(/[^0-9:]/g, ""))
+        .map(x => x.innerText)
         .filter(x => x !== "")
-        .map(x => x.split(":"))
+        .map(x => x.split("."))
         .map(x => Number(x[0]) * 60 + Number(x[1]))
         .map(x => x - 8 * 60)
         .reduce((sum, x) => sum + x, 0);
@@ -55,37 +53,49 @@ function getWorkTimeList(timeCardHeader, timeCard) {
     const dateIndex = [...timeCardHeader.children].findIndex(x => x.firstChild.textContent === '日付');
     const startTimeIndex = [...timeCardHeader.children].findIndex(x => x.firstChild.textContent === '出勤');
     const endTimeIndex = [...timeCardHeader.children].findIndex(x => x.firstChild.textContent === '退勤');
-    const restIndex = [...timeCardHeader.children].findIndex(x => x.firstChild.firstChild.textContent === '休憩')
-    const workTimeList = [...timeCard.children]
+    const restStartIndex = [...timeCardHeader.children].findIndex(x => x.firstChild.textContent === '休憩開始');
+    const restEndIndex = [...timeCardHeader.children].findIndex(x => x.firstChild.textContent === '休憩終了');
+    const year = document.querySelector("#select_year_month_picker").value.substring(0,4);
+    const workTimeList = [...timeCard]
         .map(x => [
-            x.children[dateIndex],
-            x.children[startTimeIndex],
-            x.children[endTimeIndex],
-            x.children[restIndex],
+            x.children[dateIndex].innerText,
+            x.children[startTimeIndex].innerText,
+            x.children[endTimeIndex].innerText,
+            x.children[restStartIndex].innerText,
+            x.children[restEndIndex].innerText,
         ])
+        .filter(x => x[0] !== '')
+        .filter(x => x[1] !== '')
+        .filter(x => x[2] !== '')
+        .filter(x => x[3] !== '')
+        .filter(x => x[4] !== '')
         .map(x => [
-            x[0].id,
-            x[1].children[1].firstChild,
-            x[2].children[1].firstChild,
-            x[3].children[0].firstChild,
-            x[3].children[1].firstChild,
-        ])
-        .map(x => [
-            x[0].replace(/attendances-table-date-cell-/g, ""),
-            x[1] !== null ? x[1].textContent : '',
-            x[2] !== null ? x[2].textContent : '',
-            x[3] !== null ? x[3].textContent : '',
-            x[4] !== null ? x[4].textContent : '',
-        ])
-        .map(x => [
-            x[0].replace(/-/g, "/"),
+            year +'/'+x[0].split('（')[0],
             x[1].replace(/[^0-9:]/g, ""),
             x[2].replace(/[^0-9:]/g, ""),
-            x[3].replace(/[^0-9:]/g, ""),
-            x[4].replace(/[^0-9:]/g, ""),
+            x[3].split('\n')[0].replace(/[^0-9:]/g, ""),
+            x[4].split('\n')[0].replace(/[^0-9:]/g, ""),
         ])
         .filter(x => x[1] !== "" && x[2] !== "")
         .filter(x => (x[3] === "") === (x[4] === ""))
         .reduce((sum, x) => sum + '\n' + x.join(", "), 'date,start,end, rest_start, rest_end')
     return workTimeList;
+}
+
+// ボタンがクリックされたときに実行する関数
+function showTooltip(button, text) {
+    // ツールチップを作成
+    const tooltip = document.createElement('div');
+    tooltip.classList.add('work-time-copy-tooltip');
+    tooltip.innerText = text;
+
+    // ボディにツールチップを追加
+    button.appendChild(tooltip);
+    button.style.pointerEvents = 'none';
+
+    // 1 秒後にツールチップを削除
+    setTimeout(() => {
+        button.removeChild(tooltip);
+        button.style.pointerEvents = 'auto';
+    }, 1000);
 }
