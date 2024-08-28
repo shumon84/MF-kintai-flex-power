@@ -39,8 +39,7 @@ function calcFlexPower(timeCardHeader, timeCard) {
         .map(x => x.children[totalWorkRowIndex])
         .map(x => x.innerText)
         .filter(x => x !== "")
-        .map(x => x.split("."))
-        .map(x => Number(x[0]) * 60 + Number(x[1]))
+        .map(x => Math.floor(Number(x) * 60))
         .map(x => x - 8 * 60)
         .reduce((sum, x) => sum + x, 0);
     const h = Math.floor(Math.abs(flexPower) / 60);
