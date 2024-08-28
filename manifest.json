@@ -1,19 +1,23 @@
 {
   "name": "残フレックスパワー表示君",
-  "version": "0.3",
+  "version": "0.4",
   "manifest_version": 3,
   "description": "KING OF TIME の日次勤怠画面に、出勤日の稼働時間の過不足を表示する欄を追加します。",
   "permissions": [
     "clipboardRead",
     "clipboardWrite"
   ],
-  "content_scripts": [{
-    "matches": ["https://s2.ta.kingoftime.jp/admin*"],
-    "css": [
-      "style.css"
-    ],
-    "js": [
-      "content.js"
-    ]
-  }]
+  "content_scripts": [
+    {
+      "matches": [
+        "https://s2.ta.kingoftime.jp/admin*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ]
 }
